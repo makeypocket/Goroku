@@ -52,16 +52,17 @@ type SecurityRule struct {
 }
 
 type SecurityManager struct {
-	mu          sync.RWMutex
-	client      *CustomTelegramClient
-	db          *Database
-	anyAdmin    bool
-	defaultMask int
-	tsecChat    *PointerList
-	tsecUser    *PointerList
-	owner       *PointerList
-	allUsers    *PointerList
-	sgroups     map[string]SecurityGroup
+	mu                   sync.RWMutex
+	client               *CustomTelegramClient
+	db                   *Database
+	anyAdmin             bool
+	defaultMask          int
+	tsecChat             *PointerList
+	tsecUser             *PointerList
+	owner                *PointerList
+	allUsers             *PointerList
+	sgroups              map[string]SecurityGroup
+	rightsReloadInterval time.Duration
 	// adminCache caches per-chat/per-user admin rights lookups (5-min TTL, mirrors Python security.py)
 	adminCache map[string]adminCacheEntry
 }
@@ -83,20 +84,35 @@ func NewSecurityManager(client *CustomTelegramClient, db *Database) *SecurityMan
 	}
 
 	sm := &SecurityManager{
-		client:      client,
-		db:          db,
-		anyAdmin:    anyAdmin,
-		defaultMask: defaultMask,
-		tsecChat:    NewPointerList(db, "goroku.security", "tsec_chat", []interface{}{}),
-		tsecUser:    NewPointerList(db, "goroku.security", "tsec_user", []interface{}{}),
-		owner:       NewPointerList(db, "goroku.security", "owner", []interface{}{}),
-		allUsers:    NewPointerList(db, "goroku.security", "all_users", []interface{}{}),
-		sgroups:     make(map[string]SecurityGroup),
-		adminCache:  make(map[string]adminCacheEntry),
+		client:               client,
+		db:                   db,
+		anyAdmin:             anyAdmin,
+		defaultMask:          defaultMask,
+		tsecChat:             NewPointerList(db, "goroku.security", "tsec_chat", []interface{}{}),
+		tsecUser:             NewPointerList(db, "goroku.security", "tsec_user", []interface{}{}),
+		owner:                NewPointerList(db, "goroku.security", "owner", []interface{}{}),
+		allUsers:             NewPointerList(db, "goroku.security", "all_users", []interface{}{}),
+		sgroups:              make(map[string]SecurityGroup),
+		adminCache:           make(map[string]adminCacheEntry),
+		rightsReloadInterval: time.Minute,
 	}
 
 	sm.reloadRights()
+	sm.startRightsReloader()
 	return sm
+}
+
+func (sm *SecurityManager) startRightsReloader() {
+	if sm.rightsReloadInterval <= 0 {
+		return
+	}
+
+	ticker := time.NewTicker(sm.rightsReloadInterval)
+	go func() {
+		for range ticker.C {
+			sm.reloadRights()
+		}
+	}()
 }
 
 func (sm *SecurityManager) reloadRights() {
@@ -200,7 +216,6 @@ func (sm *SecurityManager) ApplySgroups(sgroups map[string]SecurityGroup) {
 }
 
 func (sm *SecurityManager) Check(msg *Message, command string) bool {
-	sm.reloadRights()
 	log.Printf("[Security] Check: SenderID=%d, Out=%t, client.TGID=%d, command=%s\n", msg.SenderID, msg.Out, sm.client.TGID, command)
 	// First, if owner/client, bypass security check
 	if msg.SenderID == sm.client.TGID || msg.Out {
