@@ -208,11 +208,11 @@ goroku_web:
 
 goroku_backup:
   period: "⌚️ <b>Юнит «ALPHA»</b> делает бэкапы (сейвы). Можно настроить.\n\nВыбери как часто сейвиться\n\n<b>🚫 Модули из файлов (.lm) так не восстановятся! Делай .backupmods перед этим.</b>"
-  saved: "✅ Запомнил! Поменять можно через <code>{prefix}set_backup_period</code>"
-  saved_bot: "✅ Запомнил! Поменять можно через {prefix}set_backup_period"
-  never: "✅ Ок, не буду сейвить автоматом. Вернуть: <code>{prefix}set_backup_period</code>"
-  never_bot: "✅ Ок, не буду сейвить автоматом. Вернуть: {prefix}set_backup_period"
-  invalid_args: "🚫 <b>Пиши часы цифрами, или `0` чтоб оффнуть</b>"
+  saved: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Запомнил! Поменять можно через <code>{prefix}set_backup_period</code>"
+  saved_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Запомнил! Поменять можно через {prefix}set_backup_period"
+  never: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Ок, не буду сейвить автоматом. Вернуть: <code>{prefix}set_backup_period</code>"
+  never_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Ок, не буду сейвить автоматом. Вернуть: {prefix}set_backup_period"
+  invalid_args: "<tg-emoji emoji-id=\"4918014360267260850\">⛔️</tg-emoji> <b>Пиши часы цифрами, или `0` чтоб оффнуть</b>"
   backup_caption: '<tg-emoji emoji-id=5469718869536940860>👆</tg-emoji> <b>Это бэкап базы. Не кидай никому, уведут акк. Восстановить:</b> <pre><code class="language-goroku">{prefix}restoredb</code></pre> <b>реплаем на файл.</b>'
   backupall_info: '👆 <b>Это фулл бэкап (база + моды). Не сливай никому! Восстановить:</b> <pre><code class="language-goroku">{prefix}restoreall</code></pre> <b>реплаем на файл.</b>'
   all_restored: "<tg-emoji emoji-id=5774134533590880843>🔄</tg-emoji> <b>Фулл бэкап накатил, ребутаюсь....</b>"
@@ -602,13 +602,16 @@ eval:
   no_compiler: "<tg-emoji emoji-id={}>💻</tg-emoji> <b>Компилятора {} нет, скачай.</b>"
   eval_result: "\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> Выхлоп:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   print_outp: "\n\n<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji><b> Принт:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  _cmd_doc_e: "Python"
+  _cmd_doc_e: "Go"
+  _cmd_doc_eval: "Go"
+  _cmd_doc_evalpy: "Python"
   _cmd_doc_ebf: "Brainf*ck"
   _cmd_doc_ec: "C"
   _cmd_doc_ecpp: "C++"
   _cmd_doc_enode: "Node.js"
   _cmd_doc_ephp: "PHP"
   _cmd_doc_eruby: "Ruby"
+  _cmd_doc_erust: "Rust"
 
 translate:
   no_args: "<tg-emoji emoji-id=5210952531676504517>❌</tg-emoji> <b>Аргументы где?</b>"

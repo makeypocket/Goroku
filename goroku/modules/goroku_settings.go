@@ -672,9 +672,7 @@ func (m *GorokuSettings) getSettingsMarkup(im *inline.InlineManager) [][]inline.
 						Data: "hset_restart_exec",
 						Handler: func(c2 inline.CallbackQuery) error {
 							_ = c2.Answer("Your userbot is being restarted...", true)
-							if c2.BotMessage != nil {
-								_, _ = c2.BotMessage.Delete()
-							}
+							_ = closeForm(c2)
 							go func() {
 								time.Sleep(1 * time.Second)
 								goroku.Restart()
@@ -707,9 +705,7 @@ func (m *GorokuSettings) getSettingsMarkup(im *inline.InlineManager) [][]inline.
 						Data: "hset_update_exec",
 						Handler: func(c2 inline.CallbackQuery) error {
 							_ = c2.Answer("Updating userbot...", true)
-							if c2.BotMessage != nil {
-								_, _ = c2.BotMessage.Delete()
-							}
+							_ = closeForm(c2)
 							go func() {
 								loader, ok := m.client.Loader.(*goroku.Modules)
 								if ok && loader != nil {
@@ -780,9 +776,7 @@ func (m *GorokuSettings) RemoveCoreProtectionCmd(msg *goroku.Message) error {
 					Handler: func(c inline.CallbackQuery) error {
 						m.db.Set("goroku.main", "remove_core_protection", true)
 						_ = c.Answer(m.getTrans("core_protection_removed", "✅ Core protection removed"), false)
-						if c.BotMessage != nil {
-							_, _ = c.BotMessage.Delete()
-						}
+						_ = closeForm(c)
 						return nil
 					},
 				},
@@ -822,9 +816,7 @@ func (m *GorokuSettings) EnableCoreProtectionCmd(msg *goroku.Message) error {
 					Handler: func(c inline.CallbackQuery) error {
 						m.db.Set("goroku.main", "remove_core_protection", false)
 						_ = c.Answer(m.getTrans("core_protection_enabled", "✅ Core protection enabled"), false)
-						if c.BotMessage != nil {
-							_, _ = c.BotMessage.Delete()
-						}
+						_ = closeForm(c)
 						return nil
 					},
 				},

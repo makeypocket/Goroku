@@ -109,6 +109,31 @@ func (im *InlineManager) RegisterManager(afterBreak bool, ignoreTokenChecks bool
 	im.bot = bot
 	im.BotUsername = bot.Self.UserName
 	im.BotID = bot.Self.ID
+
+	if dbTyped, ok := im.db.(interface {
+		Get(string, string, interface{}) interface{}
+		Set(string, string, interface{}) bool
+	}); ok {
+		var lastBotID int64
+		if val := dbTyped.Get("goroku.inline", "last_bot_id", nil); val != nil {
+			switch v := val.(type) {
+			case float64:
+				lastBotID = int64(v)
+			case int64:
+				lastBotID = v
+			case int:
+				lastBotID = int64(v)
+			}
+		}
+
+		if lastBotID != bot.Self.ID {
+			log.Printf("[Inline] Inline bot ID changed from %d to %d (or first run). Resetting bootstrap flags.\n", lastBotID, bot.Self.ID)
+			dbTyped.Set("goroku.inline", "folder_created", false)
+			dbTyped.Set("goroku.inline", "bootstrapped_group", nil)
+			dbTyped.Set("goroku.inline", "last_bot_id", bot.Self.ID)
+		}
+	}
+
 	im.stopCh = make(chan struct{})
 	im.initComplete = true
 	if err := im.bootstrapUserBotSide(afterBreak); err != nil {
@@ -264,6 +289,15 @@ func (im *InlineManager) getToken() string {
 func (im *InlineManager) startPolling() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
+	// Explicitly request chosen_inline_result — without this Telegram
+	// does NOT deliver ChosenInlineResult updates, causing the 10-second
+	// "timeout waiting for inline message selection" error.
+	u.AllowedUpdates = []string{
+		"message",
+		"inline_query",
+		"chosen_inline_result",
+		"callback_query",
+	}
 	updates := im.bot.GetUpdatesChan(u)
 
 	for {

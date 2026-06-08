@@ -253,11 +253,11 @@ goroku_web:
 
 goroku_backup:
   period: "⌚️ <b>The unit «ALPHA»</b> creates regular backups. These settings can be changed later.\n\nPlease select the backup frequency\n\n<b>🚫 It is thus impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
-  saved: "✅ The periodicity is saved! It can be changed with <code>{prefix}set_backup_period</code>"
-  saved_bot: "✅ The periodicity is saved! It can be changed with {prefix}set_backup_period"
-  never: "✅ I will not make automatic backups. Can be cancelled using <code>{prefix}set_backup_period</code>"
-  never_bot: "✅ I will not make automatic backups. Can be cancelled using {prefix}set_backup_period"
-  invalid_args: "🚫 <b>Please specify the correct frequency in hours, or `0` to disable</b>"
+  saved: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> The periodicity is saved! It can be changed with <code>{prefix}set_backup_period</code>"
+  saved_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> The periodicity is saved! It can be changed with {prefix}set_backup_period"
+  never: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> I will not make automatic backups. Can be cancelled using <code>{prefix}set_backup_period</code>"
+  never_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> I will not make automatic backups. Can be cancelled using {prefix}set_backup_period"
+  invalid_args: "<tg-emoji emoji-id=\"4918014360267260850\">⛔️</tg-emoji> <b>Please specify the correct frequency in hours, or `0` to disable</b>"
   backup_caption: '<tg-emoji emoji-id=5469718869536940860>👆</tg-emoji> <b>This is your database backup. Do not share it with anyone, it contains personal information. If you need to restore it, use</b> <pre><code class="language-goroku">{prefix}restoredb</code></pre> <b>in response to this file.</b>'
   backupall_info: '👆 <b>This is your backup of the database and modules. Do not give it to anyone, it contains personal information. If you need to restore it, use</b> <pre><code class="language-goroku">{prefix}restoreall</code></pre> <b>in response to this file.</b>'
   all_restored_bot: "Your full backup has been restored, restarting..."
@@ -665,13 +665,16 @@ eval:
   time_exec: "\n<tg-emoji emoji-id=5134202243486057363>💫</tg-emoji> <b>Execution time: {}s</b>"
   eval_result: "\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> Result:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   print_outp: "\n\n<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji><b> Print Result:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  _cmd_doc_e: "Evaluates python code"
+  _cmd_doc_eval: "Evaluates Go code"
+  _cmd_doc_e: "Evaluates Go code"
+  _cmd_doc_evalpy: "Evaluates Python code"
   _cmd_doc_ebf: "Evaluates Brainf*ck code"
   _cmd_doc_ec: "Evaluates C code"
   _cmd_doc_ecpp: "Evaluates C++ code"
   _cmd_doc_enode: "Evaluates Node.js code"
   _cmd_doc_ephp: "Evaluates PHP code"
   _cmd_doc_eruby: "Evaluates Ruby code"
+  _cmd_doc_erust: "Evaluates Rust code"
   _cls_doc: "Evaluates code in various languages"
 
 translate:

@@ -1030,13 +1030,16 @@ eval:
     <tg-emoji emoji-id="5411228694935012881">👍</tg-emoji><b> Вывод print():</b>
 
     <pre><code class="language-{}">{}</code></pre>'
-  _cmd_doc_e: <tg-emoji emoji-id="5413438133486258132">🥺</tg-emoji> Выповняет Python код
+  _cmd_doc_e: <tg-emoji emoji-id="5413438133486258132">🥺</tg-emoji> Выповняет Go код
+  _cmd_doc_eval: <tg-emoji emoji-id="5413438133486258132">🥺</tg-emoji> Выповняет Go код
+  _cmd_doc_evalpy: <tg-emoji emoji-id="5413438133486258132">🥺</tg-emoji> Выповняет Python код
   _cmd_doc_ebf: <tg-emoji emoji-id="5413792661561705517">😏</tg-emoji> Выповняет Brainf*ck код
   _cmd_doc_ec: <tg-emoji emoji-id="5411228694935012881">👍</tg-emoji> Выповняет C код
   _cmd_doc_ecpp: <tg-emoji emoji-id="5413584527446541529">💐</tg-emoji> Выповняет C++ код
   _cmd_doc_enode: <tg-emoji emoji-id="5413584527446541529">💐</tg-emoji> Выповняет Node.js код
   _cmd_doc_ephp: <tg-emoji emoji-id="5411167139463736746">🍪</tg-emoji> Выповняет PHP код
   _cmd_doc_eruby: <tg-emoji emoji-id="5411385529960791742">😎</tg-emoji> Выповняет Ruby код
+  _cmd_doc_erust: <tg-emoji emoji-id="5411385529960791742">😎</tg-emoji> Выповняет Rust код
 translate:
   no_args: <tg-emoji emoji-id="5413584527446541529">💐</tg-emoji> ❌ <b>Не указаны авгументы</b>
   error: <tg-emoji emoji-id="5411228694935012881">👍</tg-emoji> ❌ <b>Не удавось певевести текст</b>

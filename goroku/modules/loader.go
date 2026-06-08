@@ -598,7 +598,7 @@ func (m *LoaderModule) ClearmodulesCmd(msg *goroku.Message) error {
 				Data: "clear_mods_confirm",
 				Handler: func(c inline.CallbackQuery) error {
 					_ = c.Answer("Deleting modules...", false)
-					_, _ = c.BotMessage.Delete()
+					_ = closeForm(c)
 
 					loadedMods := make(map[string]string)
 					val := m.db.Get("Loader", "loaded_modules", nil)
@@ -630,8 +630,7 @@ func (m *LoaderModule) ClearmodulesCmd(msg *goroku.Message) error {
 				Text: m.getTrans("cancel", "Cancel"),
 				Data: "clear_mods_cancel",
 				Handler: func(c inline.CallbackQuery) error {
-					_, err := c.BotMessage.Delete()
-					return err
+					return closeForm(c)
 				},
 			},
 		},

@@ -16,7 +16,7 @@ type APIProtection struct {
 	db               *goroku.Database
 	translator       *goroku.Translator
 	suspendUntil     time.Time
-	forbiddenTypeIDs []int
+	forbiddenTypeIDs []uint32
 }
 
 func (m *APIProtection) Name() string {
@@ -91,13 +91,13 @@ func (m *APIProtection) updateForbiddenMethods(config map[string]interface{}) {
 		}
 	}
 
-	constructorMap := map[string]int{
+	constructorMap := map[string]uint32{
 		"sendReaction":     3540875476,
 		"joinChannel":      615851205,
 		"importChatInvite": 1817183516,
 	}
 
-	var typeIDs []int
+	var typeIDs []uint32
 	for _, f := range forbidden {
 		if id, ok := constructorMap[f]; ok {
 			typeIDs = append(typeIDs, id)

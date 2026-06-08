@@ -595,7 +595,7 @@ func (m *SettingsModule) ClearDBCmd(msg *goroku.Message) error {
 				Data: "cleardb_confirm",
 				Handler: func(c inline.CallbackQuery) error {
 					_ = c.Answer("Clearing database...", false)
-					_, _ = c.BotMessage.Delete()
+					_ = closeForm(c)
 
 					m.db.Reset(make(map[string]map[string]interface{}))
 
@@ -609,8 +609,7 @@ func (m *SettingsModule) ClearDBCmd(msg *goroku.Message) error {
 				Text: m.getTrans("cancel", "🚫 Cancel"),
 				Data: "cleardb_cancel",
 				Handler: func(c inline.CallbackQuery) error {
-					_, err := c.BotMessage.Delete()
-					return err
+					return closeForm(c)
 				},
 			},
 		},

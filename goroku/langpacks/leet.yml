@@ -222,11 +222,11 @@ goroku_web:
 
 goroku_backup:
   period: "⌚️ <b>7h3 un17 «ALPHA»</b> cr34735 r3gul4r b4ckup5. 7h353 s3771ng5 c4n b3 ch4ng3d l473r.\n\nPlz s3l3c7 7h3 b4ckup fr3qu3ncy\n\n<b>🚫 17 15 7hu5 1mp0551bl3 2 r3570r3 m0d5 d0wnl04d3d fr0m f1l35 w17h .lm cmd! B3 c4r3ful & d0 .backupmods b4 r3570r1ng.</b>"
-  saved: "✅ 7h3 p3r10d1c17y 15 s4v3d! 17 c4n b3 ch4ng3d w17h <code>{prefix}set_backup_period</code>"
-  saved_bot: "✅ 7h3 p3r10d1c17y 15 s4v3d! 17 c4n b3 ch4ng3d w17h {prefix}set_backup_period"
-  never: "✅ I w1ll n07 m4k3 4u70 b4ckup5. C4n b3 c4nc3ll3d u51ng <code>{prefix}set_backup_period</code>"
-  never_bot: "✅ I w1ll n07 m4k3 4u70 b4ckup5. C4n b3 c4nc3ll3d u51ng {prefix}set_backup_period"
-  invalid_args: "🚫 <b>Plz sp3c1fy 7h3 c0rr3c7 fr3qu3ncy 1n hr5, 0r `0` 2 d154bl3</b>"
+  saved: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> 7h3 p3r10d1c17y 15 s4v3d! 17 c4n b3 ch4ng3d w17h <code>{prefix}set_backup_period</code>"
+  saved_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> 7h3 p3r10d1c17y 15 s4v3d! 17 c4n b3 ch4ng3d w17h {prefix}set_backup_period"
+  never: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> I w1ll n07 m4k3 4u70 b4ckup5. C4n b3 c4nc3ll3d u51ng <code>{prefix}set_backup_period</code>"
+  never_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> I w1ll n07 m4k3 4u70 b4ckup5. C4n b3 c4nc3ll3d u51ng {prefix}set_backup_period"
+  invalid_args: "<tg-emoji emoji-id=\"4918014360267260850\">⛔️</tg-emoji> <b>Plz sp3c1fy 7h3 c0rr3c7 fr3qu3ncy 1n hr5, 0r `0` 2 d154bl3</b>"
   backup_caption: '<tg-emoji emoji-id=5469718869536940860>👆</tg-emoji> <b>7h15 15 ur DB b4ckup. D0 n07 sh4r3 17 w17h 4ny1, 17 c0n741n5 p3r50n4l 1nf0. 1f u n33d 2 r3570r3 17, u53</b> <pre><code class="language-goroku">{prefix}restoredb</code></pre> <b>1n r35p0n53 2 7h15 f1l3.</b>'
   backupall_info: '👆 <b>7h15 15 ur b4ckup 0f DB & m0d5. D0 n07 g1v3 17 2 4ny1, 17 c0n741n5 p3r50n4l 1nf0. 1f u n33d 2 r3570r3 17, u53</b> <pre><code class="language-goroku">{prefix}restoreall</code></pre> <b>1n r35p0n53 2 7h15 f1l3.</b>'
   all_restored: "<tg-emoji emoji-id=5774134533590880843>🔄</tg-emoji> <b>Ur full b4ckup h45 b33n r3570r3d, r3574r71ng...</b>"
@@ -634,13 +634,16 @@ eval:
   time_exec: "\n<tg-emoji emoji-id=5134202243486057363>💫</tg-emoji> <b>Ex3cu710n 71m3: {}s</b>"
   eval_result: "\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> R35ul7:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   print_outp: "\n\n<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji><b> Pr1n7 R35ul7:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  _cmd_doc_e: "3v4lu4735 py7h0n c0d3"
+  _cmd_doc_e: "3v4lu4735 G0 c0d3"
+  _cmd_doc_eval: "3v4lu4735 G0 c0d3"
+  _cmd_doc_evalpy: "3v4lu4735 py7h0n c0d3"
   _cmd_doc_ebf: "3v4lu4735 Br41nf*ck c0d3"
   _cmd_doc_ec: "3v4lu4735 C c0d3"
   _cmd_doc_ecpp: "3v4lu4735 C++ c0d3"
   _cmd_doc_enode: "3v4lu4735 N0d3.j5 c0d3"
   _cmd_doc_ephp: "3v4lu4735 PHP c0d3"
   _cmd_doc_eruby: "3v4lu4735 Ruby c0d3"
+  _cmd_doc_erust: "3v4lu4735 Ru57 c0d3"
   _cls_doc: "3v4lu4735 c0d3 1n v4r10u5 l4ng5"
 
 translate:

@@ -166,8 +166,8 @@ func (m *GorokuBackup) makeBackupPeriodButton(text string, hours int) inline.But
 }
 
 func (m *GorokuBackup) handleSetBackupPeriodCallback(call inline.CallbackQuery, hours int) error {
-	prefix := "/"
-	if val, ok := m.db.Get("main", "command_prefix", "").(string); ok && val != "" {
+	prefix := "."
+	if val, ok := m.db.Get("goroku.main", "command_prefix", ".").(string); ok && val != "" {
 		prefix = val
 	}
 
@@ -254,8 +254,8 @@ func (m *GorokuBackup) getBackupTopicID() int32 {
 
 
 func (m *GorokuBackup) handleConvertCallback(call inline.CallbackQuery, ans string, fileContent string) error {
-	prefix := "/"
-	if val, ok := m.db.Get("main", "command_prefix", "").(string); ok && val != "" {
+	prefix := "."
+	if val, ok := m.db.Get("goroku.main", "command_prefix", ".").(string); ok && val != "" {
 		prefix = val
 	}
 
@@ -310,8 +310,8 @@ func (m *GorokuBackup) BackupDBCmd(msg *goroku.Message) error {
 	}
 
 	filename := fmt.Sprintf("db-backup-%s.json", time.Now().Format("02-01-2006-15-04"))
-	prefix := "/"
-	if val, ok := m.db.Get("main", "command_prefix", "").(string); ok && val != "" {
+	prefix := "."
+	if val, ok := m.db.Get("goroku.main", "command_prefix", ".").(string); ok && val != "" {
 		prefix = val
 	}
 	captionTrans := m.getTrans("backup_caption", "")
@@ -341,10 +341,10 @@ func (m *GorokuBackup) BackupDBCmd(msg *goroku.Message) error {
 	}
 
 	msgID := goroku.GetSentMessageID(res)
-	link := fmt.Sprintf("https://t.me/c/%d/%d/%d", contentChannelID, topicID, msgID)
+	link := fmt.Sprintf("https://t.me/c/%d/%d/%d", cleanChannelIDForLink(contentChannelID), topicID, msgID)
 
 	sentTrans := m.getTrans("backup_sent", "")
-	sentMsg := fmt.Sprintf(sentTrans, link)
+	sentMsg := formatTrans(sentTrans, link)
 
 	return msg.Answer(sentMsg)
 }
@@ -397,8 +397,8 @@ func (m *GorokuBackup) RestoreDBCmd(msg *goroku.Message) error {
 	var backupData map[string]map[string]interface{}
 	err = json.Unmarshal(buf.Bytes(), &backupData)
 	if err != nil {
-		prefix := "/"
-		if val, ok := m.db.Get("main", "command_prefix", "").(string); ok && val != "" {
+		prefix := "."
+		if val, ok := m.db.Get("goroku.main", "command_prefix", ".").(string); ok && val != "" {
 			prefix = val
 		}
 		probZipTrans := m.getTrans("probably_zip", "")
@@ -425,8 +425,8 @@ func (m *GorokuBackup) RestoreDBCmd(msg *goroku.Message) error {
 
 // BackupModsCmd sends a zip archive of the modules.
 func (m *GorokuBackup) BackupModsCmd(msg *goroku.Message) error {
-	prefix := "/"
-	if val, ok := m.db.Get("main", "command_prefix", "").(string); ok && val != "" {
+	prefix := "."
+	if val, ok := m.db.Get("goroku.main", "command_prefix", ".").(string); ok && val != "" {
 		prefix = val
 	}
 
@@ -466,7 +466,7 @@ func (m *GorokuBackup) BackupModsCmd(msg *goroku.Message) error {
 	filename := fmt.Sprintf("mods-%s.zip", time.Now().Format("02-01-2006-15-04"))
 
 	captionTrans := m.getTrans("modules_backup", "")
-	caption := fmt.Sprintf(captionTrans, modsCount, prefix)
+	caption := formatTrans(captionTrans, strconv.Itoa(modsCount), prefix)
 
 	nr := &namedReader{r: bytes.NewReader(buf.Bytes()), name: filename}
 
@@ -492,10 +492,10 @@ func (m *GorokuBackup) BackupModsCmd(msg *goroku.Message) error {
 	}
 
 	msgID := goroku.GetSentMessageID(res)
-	link := fmt.Sprintf("https://t.me/c/%d/%d/%d", contentChannelID, topicID, msgID)
+	link := fmt.Sprintf("https://t.me/c/%d/%d/%d", cleanChannelIDForLink(contentChannelID), topicID, msgID)
 
 	sentTrans := m.getTrans("backup_sent", "")
-	sentMsg := fmt.Sprintf(sentTrans, link)
+	sentMsg := formatTrans(sentTrans, link)
 
 	return msg.Answer(sentMsg)
 }
@@ -696,8 +696,8 @@ func (m *GorokuBackup) RestoreAllCmd(msg *goroku.Message) error {
 
 // BackupAllCmd sends a zip archive containing db.json + mods/*.go files.
 func (m *GorokuBackup) BackupAllCmd(msg *goroku.Message) error {
-	prefix := "/"
-	if val, ok := m.db.Get("main", "command_prefix", "").(string); ok && val != "" {
+	prefix := "."
+	if val, ok := m.db.Get("goroku.main", "command_prefix", ".").(string); ok && val != "" {
 		prefix = val
 	}
 
@@ -763,20 +763,29 @@ func (m *GorokuBackup) BackupAllCmd(msg *goroku.Message) error {
 		}
 
 		formText := m.getTrans("backupall_sent", "")
-		link := fmt.Sprintf("https://t.me/c/%d/%d/%d", contentChannelID, topicID, msgID)
-		formTextFormatted := fmt.Sprintf(formText, link)
+		link := fmt.Sprintf("https://t.me/c/%d/%d/%d", cleanChannelIDForLink(contentChannelID), topicID, msgID)
+		formTextFormatted := formatTrans(formText, link)
 
-		_, err = im.Form(formTextFormatted, dummy, markup)
+		var formTarget interface{} = dummy
+		if topicID == 0 {
+			formTarget = msg
+		}
+
+		_, err = im.Form(formTextFormatted, formTarget, markup)
 		if err != nil {
 			log.Printf("Failed to send inline restore form: %v", err)
+		}
+
+		if topicID != 0 {
+			return msg.Answer(formTextFormatted)
 		}
 		return nil
 	}
 
 	// If inline is not complete, just print the text link to the sent file
-	link := fmt.Sprintf("https://t.me/c/%d/%d/%d", contentChannelID, topicID, msgID)
+	link := fmt.Sprintf("https://t.me/c/%d/%d/%d", cleanChannelIDForLink(contentChannelID), topicID, msgID)
 	sentTrans := m.getTrans("backupall_sent", "")
-	sentMsg := fmt.Sprintf(sentTrans, link)
+	sentMsg := formatTrans(sentTrans, link)
 	return msg.Answer(sentMsg)
 }
 
@@ -837,8 +846,8 @@ func (m *GorokuBackup) handleRestoreExecuteFromMessageCallback(call inline.Callb
 func (m *GorokuBackup) SetBackupPeriodCmd(msg *goroku.Message) error {
 	raw := strings.TrimSpace(utils.GetArgsRaw(msg.Text))
 
-	prefix := "/"
-	if val, ok := m.db.Get("main", "command_prefix", "").(string); ok && val != "" {
+	prefix := "."
+	if val, ok := m.db.Get("goroku.main", "command_prefix", ".").(string); ok && val != "" {
 		prefix = val
 	}
 
@@ -930,8 +939,8 @@ func (m *GorokuBackup) sendPeriodicBackup() error {
 
 	filename := fmt.Sprintf("backup-%s.backup", time.Now().Format("02-01-2006-15-04"))
 
-	prefix := "/"
-	if val, ok := m.db.Get("main", "command_prefix", "").(string); ok && val != "" {
+	prefix := "."
+	if val, ok := m.db.Get("goroku.main", "command_prefix", ".").(string); ok && val != "" {
 		prefix = val
 	}
 	infoTrans := m.getTrans("backupall_info", "")
@@ -989,8 +998,8 @@ func (m *GorokuBackup) sendPeriodicBackup() error {
 		}
 
 		formText := m.getTrans("backupall_sent", "")
-		link := fmt.Sprintf("https://t.me/c/%d/%d/%d", contentChannelID, topicID, msgID)
-		formTextFormatted := fmt.Sprintf(formText, link)
+		link := fmt.Sprintf("https://t.me/c/%d/%d/%d", cleanChannelIDForLink(contentChannelID), topicID, msgID)
+		formTextFormatted := formatTrans(formText, link)
 
 		_, _ = im.Form(formTextFormatted, dummy, markup)
 	}
@@ -1079,3 +1088,16 @@ type namedReader struct {
 
 func (nr *namedReader) Read(p []byte) (int, error) { return nr.r.Read(p) }
 func (nr *namedReader) Name() string               { return nr.name }
+
+func cleanChannelIDForLink(id int64) int64 {
+	if id < 0 {
+		id = -id
+	}
+	s := strconv.FormatInt(id, 10)
+	if strings.HasPrefix(s, "100") && len(s) > 3 {
+		if val, err := strconv.ParseInt(s[3:], 10, 64); err == nil {
+			return val
+		}
+	}
+	return id
+}

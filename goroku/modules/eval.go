@@ -55,6 +55,10 @@ func (m *Eval) Commands() map[string]goroku.CommandHandler {
 		"ec":     m.ECCmd,
 		"ecpp":   m.ECPPCmd,
 		"enode":  m.ENodeCmd,
+		"ephp":   m.EPHPCmd,
+		"eruby":  m.ERubyCmd,
+		"ebf":    m.EBFCmd,
+		"erust":  m.ERustCmd,
 	}
 }
 
@@ -65,6 +69,18 @@ func (m *Eval) CommandMetas() map[string]goroku.CommandMeta {
 		},
 		"evalpy": {
 			Aliases: []string{"epy", "py"},
+		},
+		"ephp": {
+			Aliases: []string{"php"},
+		},
+		"eruby": {
+			Aliases: []string{"ruby"},
+		},
+		"ebf": {
+			Aliases: []string{"bf"},
+		},
+		"erust": {
+			Aliases: []string{"rust"},
 		},
 	}
 }
@@ -493,6 +509,30 @@ func messageToPythonMap(msg *goroku.Message) map[string]interface{} {
 	}
 }
 
+func isFullPackageGo(code string) bool {
+	trimmed := strings.TrimSpace(code)
+	for {
+		if strings.HasPrefix(trimmed, "//") {
+			idx := strings.Index(trimmed, "\n")
+			if idx == -1 {
+				return false
+			}
+			trimmed = strings.TrimSpace(trimmed[idx:])
+			continue
+		}
+		if strings.HasPrefix(trimmed, "/*") {
+			idx := strings.Index(trimmed, "*/")
+			if idx == -1 {
+				return false
+			}
+			trimmed = strings.TrimSpace(trimmed[idx+2:])
+			continue
+		}
+		break
+	}
+	return strings.HasPrefix(trimmed, "package ")
+}
+
 func (m *Eval) runYaegiEval(msg *goroku.Message, code string) (string, string, string, error) {
 	var stdout, stderr bytes.Buffer
 	i := interp.New(interp.Options{Stdout: &stdout, Stderr: &stderr})
@@ -509,6 +549,14 @@ func (m *Eval) runYaegiEval(msg *goroku.Message, code string) (string, string, s
 		},
 	}); err != nil {
 		return "", "", "", err
+	}
+
+	if isFullPackageGo(code) {
+		_, err := m.evalYaegiWithTimeout(i, code)
+		if err != nil {
+			return "", strings.TrimSpace(stdout.String()), strings.TrimSpace(stderr.String()), err
+		}
+		return "", strings.TrimSpace(stdout.String()), strings.TrimSpace(stderr.String()), nil
 	}
 
 	source := m.buildYaegiSource(code, true)
@@ -583,7 +631,7 @@ func (m *Eval) evalYaegiWithTimeout(i *interp.Interpreter, source string) (refle
 	var err error
 	go func() {
 		value, err = i.Eval(source)
-		if err == nil {
+		if err == nil && !isFullPackageGo(source) {
 			value, err = i.Eval("__run__")
 		}
 		close(done)
@@ -812,6 +860,435 @@ func (m *Eval) ENodeCmd(msg *goroku.Message) error {
 		transKey,
 		"4985643941807260310",
 		"javascript",
+		utils.EscapeHTML(code),
+		errorOrOutputLabel,
+		utils.EscapeHTML(m.censor(output)),
+	)
+
+	if msg.Client != nil {
+		msg.Client.EditMessage(msg.ChatID, msg.ID, msg.Text) //nolint:errcheck
+	}
+	return nil
+}
+
+func runBrainfuck(code string) (string, error) {
+	var instructions []rune
+	for _, r := range code {
+		if strings.ContainsRune("><+-.,[]", r) {
+			instructions = append(instructions, r)
+		}
+	}
+
+	jumps := make(map[int]int)
+	var stack []int
+	for i, r := range instructions {
+		if r == '[' {
+			stack = append(stack, i)
+		} else if r == ']' {
+			if len(stack) == 0 {
+				return "", fmt.Errorf("unmatched ']' at instruction %d", i)
+			}
+			openIdx := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+			jumps[openIdx] = i
+			jumps[i] = openIdx
+		}
+	}
+	if len(stack) > 0 {
+		return "", fmt.Errorf("unmatched '[' at instruction %d", stack[len(stack)-1])
+	}
+
+	tape := make([]byte, 30000)
+	ptr := 0
+	pc := 0
+	var out bytes.Buffer
+	steps := 0
+	maxSteps := 1000000
+
+	for pc < len(instructions) {
+		steps++
+		if steps > maxSteps {
+			return out.String(), fmt.Errorf("execution limit exceeded (potential infinite loop)")
+		}
+
+		switch instructions[pc] {
+		case '>':
+			ptr++
+			if ptr >= len(tape) {
+				ptr = 0
+			}
+		case '<':
+			ptr--
+			if ptr < 0 {
+				ptr = len(tape) - 1
+			}
+		case '+':
+			tape[ptr]++
+		case '-':
+			tape[ptr]--
+		case '.':
+			out.WriteByte(tape[ptr])
+		case ',':
+			tape[ptr] = 0
+		case '[':
+			if tape[ptr] == 0 {
+				pc = jumps[pc]
+			}
+		case ']':
+			if tape[ptr] != 0 {
+				pc = jumps[pc]
+			}
+		}
+		pc++
+	}
+	return out.String(), nil
+}
+
+func (m *Eval) EBFCmd(msg *goroku.Message) error {
+	code := utils.GetArgsRaw(msg.RawText)
+	if code == "" {
+		reply, err := msg.GetReplyMessage()
+		if err == nil && reply != nil && reply.RawText != "" {
+			code = reply.RawText
+		}
+	}
+	if code == "" {
+		msg.Text = "❌ No code to execute"
+		return nil
+	}
+
+	output, err := runBrainfuck(code)
+	errorOccurred := false
+	if err != nil {
+		errorOccurred = true
+		if output == "" {
+			output = err.Error()
+		} else {
+			output = output + "\n\nError: " + err.Error()
+		}
+	}
+
+	evalOrErrTrans := "eval"
+	if errorOccurred {
+		evalOrErrTrans = "err"
+	}
+
+	transKey := m.getTrans(evalOrErrTrans, "")
+	if transKey == "" {
+		if errorOccurred {
+			transKey = "<tg-emoji emoji-id={}>💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Error:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+		} else {
+			transKey = "<tg-emoji emoji-id={}>💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> Result:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+		}
+	}
+
+	errorOrOutputLabel := "output"
+	if errorOccurred {
+		errorOrOutputLabel = "error"
+	}
+
+	msg.Text = formatTrans(
+		transKey,
+		"4985930888572306287",
+		"brainfuck",
+		utils.EscapeHTML(code),
+		errorOrOutputLabel,
+		utils.EscapeHTML(m.censor(output)),
+	)
+
+	if msg.Client != nil {
+		msg.Client.EditMessage(msg.ChatID, msg.ID, msg.Text) //nolint:errcheck
+	}
+	return nil
+}
+
+func (m *Eval) EPHPCmd(msg *goroku.Message) error {
+	code := utils.GetArgsRaw(msg.RawText)
+	if code == "" {
+		reply, err := msg.GetReplyMessage()
+		if err == nil && reply != nil && reply.RawText != "" {
+			code = reply.RawText
+		}
+	}
+	if code == "" {
+		msg.Text = "❌ No code to execute"
+		return nil
+	}
+	code = strings.ReplaceAll(code, "\u00a0", " ")
+
+	_, checkErr := exec.LookPath("php")
+	if checkErr != nil {
+		noCompilerTrans := m.getTrans("no_compiler", "<tg-emoji emoji-id={}>💻</tg-emoji> <b>{} interpreter is not installed on the system.</b>")
+		msg.Text = formatTrans(noCompilerTrans, "4983593786413155017", "PHP")
+		if msg.Client != nil {
+			msg.Client.EditMessage(msg.ChatID, msg.ID, msg.Text) //nolint:errcheck
+		}
+		return nil
+	}
+
+	tmpDir, err := os.MkdirTemp("", "eval_php_*")
+	if err != nil {
+		msg.Text = fmt.Sprintf("❌ Error creating temp dir: %s", err.Error())
+		return nil
+	}
+	defer os.RemoveAll(tmpDir)
+
+	srcFile := filepath.Join(tmpDir, "code.php")
+	err = os.WriteFile(srcFile, []byte(code), 0644)
+	if err != nil {
+		msg.Text = fmt.Sprintf("❌ Error writing code: %s", err.Error())
+		return nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "php", srcFile)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+
+	err = cmd.Run()
+	output := out.String()
+	errorOccurred := false
+	if err != nil {
+		errorOccurred = true
+		if output == "" {
+			output = err.Error()
+		}
+	}
+
+	evalOrErrTrans := "eval"
+	if errorOccurred {
+		evalOrErrTrans = "err"
+	}
+
+	transKey := m.getTrans(evalOrErrTrans, "")
+	if transKey == "" {
+		if errorOccurred {
+			transKey = "<tg-emoji emoji-id={}>💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Error:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+		} else {
+			transKey = "<tg-emoji emoji-id={}>💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> Result:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+		}
+	}
+
+	errorOrOutputLabel := "output"
+	if errorOccurred {
+		errorOrOutputLabel = "error"
+	}
+
+	msg.Text = formatTrans(
+		transKey,
+		"4983593786413155017",
+		"php",
+		utils.EscapeHTML(code),
+		errorOrOutputLabel,
+		utils.EscapeHTML(m.censor(output)),
+	)
+
+	if msg.Client != nil {
+		msg.Client.EditMessage(msg.ChatID, msg.ID, msg.Text) //nolint:errcheck
+	}
+	return nil
+}
+
+func (m *Eval) ERubyCmd(msg *goroku.Message) error {
+	code := utils.GetArgsRaw(msg.RawText)
+	if code == "" {
+		reply, err := msg.GetReplyMessage()
+		if err == nil && reply != nil && reply.RawText != "" {
+			code = reply.RawText
+		}
+	}
+	if code == "" {
+		msg.Text = "❌ No code to execute"
+		return nil
+	}
+	code = strings.ReplaceAll(code, "\u00a0", " ")
+
+	_, checkErr := exec.LookPath("ruby")
+	if checkErr != nil {
+		noCompilerTrans := m.getTrans("no_compiler", "<tg-emoji emoji-id={}>💻</tg-emoji> <b>{} interpreter is not installed on the system.</b>")
+		msg.Text = formatTrans(noCompilerTrans, "4985760855112024628", "Ruby")
+		if msg.Client != nil {
+			msg.Client.EditMessage(msg.ChatID, msg.ID, msg.Text) //nolint:errcheck
+		}
+		return nil
+	}
+
+	tmpDir, err := os.MkdirTemp("", "eval_rb_*")
+	if err != nil {
+		msg.Text = fmt.Sprintf("❌ Error creating temp dir: %s", err.Error())
+		return nil
+	}
+	defer os.RemoveAll(tmpDir)
+
+	srcFile := filepath.Join(tmpDir, "code.rb")
+	err = os.WriteFile(srcFile, []byte(code), 0644)
+	if err != nil {
+		msg.Text = fmt.Sprintf("❌ Error writing code: %s", err.Error())
+		return nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "ruby", srcFile)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+
+	err = cmd.Run()
+	output := out.String()
+	errorOccurred := false
+	if err != nil {
+		errorOccurred = true
+		if output == "" {
+			output = err.Error()
+		}
+	}
+
+	evalOrErrTrans := "eval"
+	if errorOccurred {
+		evalOrErrTrans = "err"
+	}
+
+	transKey := m.getTrans(evalOrErrTrans, "")
+	if transKey == "" {
+		if errorOccurred {
+			transKey = "<tg-emoji emoji-id={}>💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Error:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+		} else {
+			transKey = "<tg-emoji emoji-id={}>💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> Result:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+		}
+	}
+
+	errorOrOutputLabel := "output"
+	if errorOccurred {
+		errorOrOutputLabel = "error"
+	}
+
+	msg.Text = formatTrans(
+		transKey,
+		"4985760855112024628",
+		"ruby",
+		utils.EscapeHTML(code),
+		errorOrOutputLabel,
+		utils.EscapeHTML(m.censor(output)),
+	)
+
+	if msg.Client != nil {
+		msg.Client.EditMessage(msg.ChatID, msg.ID, msg.Text) //nolint:errcheck
+	}
+	return nil
+}
+
+func (m *Eval) ERustCmd(msg *goroku.Message) error {
+	code := utils.GetArgsRaw(msg.RawText)
+	if code == "" {
+		reply, err := msg.GetReplyMessage()
+		if err == nil && reply != nil && reply.RawText != "" {
+			code = reply.RawText
+		}
+	}
+	if code == "" {
+		msg.Text = "❌ No code to compile/execute"
+		return nil
+	}
+	code = strings.ReplaceAll(code, "\u00a0", " ")
+
+	_, checkErr := exec.LookPath("rustc")
+	if checkErr != nil {
+		noCompilerTrans := m.getTrans("no_compiler", "<tg-emoji emoji-id={}>💻</tg-emoji> <b>{} compiler is not installed on the system.</b>")
+		msg.Text = formatTrans(noCompilerTrans, "4994944646242108269", "Rust")
+		if msg.Client != nil {
+			msg.Client.EditMessage(msg.ChatID, msg.ID, msg.Text) //nolint:errcheck
+		}
+		return nil
+	}
+
+	compilingTrans := m.getTrans("compiling", "<tg-emoji emoji-id=5325787248363314644>🫥</tg-emoji> <b>Compiling code...</b>")
+	_ = msg.Answer(compilingTrans)
+
+	tmpDir, err := os.MkdirTemp("", "eval_rs_*")
+	if err != nil {
+		msg.Text = fmt.Sprintf("❌ Error creating temp dir: %s", err.Error())
+		return nil
+	}
+	defer os.RemoveAll(tmpDir)
+
+	srcFile := filepath.Join(tmpDir, "code.rs")
+	err = os.WriteFile(srcFile, []byte(code), 0644)
+	if err != nil {
+		msg.Text = fmt.Sprintf("❌ Error writing code: %s", err.Error())
+		return nil
+	}
+
+	binFile := filepath.Join(tmpDir, "code")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	cmdCompile := exec.CommandContext(ctx, "rustc", "-o", binFile, srcFile)
+	var compileOut bytes.Buffer
+	cmdCompile.Stdout = &compileOut
+	cmdCompile.Stderr = &compileOut
+
+	err = cmdCompile.Run()
+	if err != nil {
+		errMsg := compileOut.String()
+		if errMsg == "" {
+			errMsg = err.Error()
+		}
+
+		errTrans := m.getTrans("err", "<tg-emoji emoji-id={}>💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Error:</b>\n<pre><code class=\"language-{}\">{}</code></pre>")
+		msg.Text = formatTrans(errTrans, "4994944646242108269", "rust", utils.EscapeHTML(code), "error", m.censor(errMsg))
+		if msg.Client != nil {
+			msg.Client.EditMessage(msg.ChatID, msg.ID, msg.Text) //nolint:errcheck
+		}
+		return nil
+	}
+
+	ctxRun, cancelRun := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelRun()
+
+	cmdRun := exec.CommandContext(ctxRun, binFile)
+	var runOut bytes.Buffer
+	cmdRun.Stdout = &runOut
+	cmdRun.Stderr = &runOut
+
+	err = cmdRun.Run()
+	output := runOut.String()
+	errorOccurred := false
+	if err != nil {
+		errorOccurred = true
+		if output == "" {
+			output = err.Error()
+		}
+	}
+
+	evalOrErrTrans := "eval"
+	if errorOccurred {
+		evalOrErrTrans = "err"
+	}
+
+	transKey := m.getTrans(evalOrErrTrans, "")
+	if transKey == "" {
+		if errorOccurred {
+			transKey = "<tg-emoji emoji-id={}>💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Error:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+		} else {
+			transKey = "<tg-emoji emoji-id={}>💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> Result:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+		}
+	}
+
+	errorOrOutputLabel := "output"
+	if errorOccurred {
+		errorOrOutputLabel = "error"
+	}
+
+	msg.Text = formatTrans(
+		transKey,
+		"4994944646242108269",
+		"rust",
 		utils.EscapeHTML(code),
 		errorOrOutputLabel,
 		utils.EscapeHTML(m.censor(output)),

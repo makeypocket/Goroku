@@ -222,11 +222,11 @@ goroku_web:
 
 goroku_backup:
   period: "⌚️ <b>Da unit «AWPHA»</b> cweates weguwaw backups. Dese settings can be changed watew.\n\nPwease sewect da backup fwequency\n\n<b>🚫 It is dus impossibwe to westowe moduwes downwoaded fwom fiwes with da .lm command! Be cawefuw and do .backupmods befowe westowing.</b>"
-  saved: "✅ Da pewiodicity is saved! It can be changed with <code>{prefix}set_backup_period</code>"
-  saved_bot: "✅ Da pewiodicity is saved! It can be changed with {prefix}set_backup_period"
-  never: "✅ I wiww nyot make automatic backups. Can be cancewwed using <code>{prefix}set_backup_period</code>"
-  never_bot: "✅ I wiww nyot make automatic backups. Can be cancewwed using {prefix}set_backup_period"
-  invalid_args: "🚫 <b>Pwease specify da cowwect fwequency in houws, ow `0` to disabwe</b>"
+  saved: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Da pewiodicity is saved! It can be changed with <code>{prefix}set_backup_period</code>"
+  saved_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Da pewiodicity is saved! It can be changed with {prefix}set_backup_period"
+  never: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> I wiww nyot make automatic backups. Can be cancewwed using <code>{prefix}set_backup_period</code>"
+  never_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> I wiww nyot make automatic backups. Can be cancewwed using {prefix}set_backup_period"
+  invalid_args: "<tg-emoji emoji-id=\"4918014360267260850\">⛔️</tg-emoji> <b>Pwease specify da cowwect fwequency in houws, ow `0` to disabwe</b>"
   backup_caption: '<tg-emoji emoji-id=5469718869536940860>👆</tg-emoji> <b>Dis is youw database backup. Do nyot shawe it with anyonye, it contains pewsonaw info. If you nyeed to westowe it, use</b> <pre><code class="language-goroku">{prefix}restoredb</code></pre> <b>in wesponse to dis fiwe. Shhh! It is a secwet! &gt;///&lt;</b>'
   backupall_info: '👆 <b>Dis is youw backup of da database and moduwes. Do nyot give it to anyonye, it contains pewsonaw info. If you nyeed to westowe it, use</b> <pre><code class="language-goroku">{prefix}restoreall</code></pre> <b>in wesponse to dis fiwe.</b>'
   all_restored: "<tg-emoji emoji-id=5774134533590880843>🔄</tg-emoji> <b>Youw fuww backup has been westowed, westawting....</b>"
@@ -634,13 +634,16 @@ eval:
   time_exec: "\n<tg-emoji emoji-id=5134202243486057363>💫</tg-emoji> <b>Execution time: {}s</b>"
   eval_result: "\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> Wesuwt:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   print_outp: "\n\n<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji><b> Pwint Wesuwt:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  _cmd_doc_e: "Evawuates pydon code"
+  _cmd_doc_e: "Evawuates Go code"
+  _cmd_doc_eval: "Evawuates Go code"
+  _cmd_doc_evalpy: "Evawuates pydon code"
   _cmd_doc_ebf: "Evawuates Bwainf*ck code"
   _cmd_doc_ec: "Evawuates C code"
   _cmd_doc_ecpp: "Evawuates C++ code"
   _cmd_doc_enode: "Evawuates Nyode.js code"
   _cmd_doc_ephp: "Evawuates PHP code"
   _cmd_doc_eruby: "Evawuates Wuby code"
+  _cmd_doc_erust: "Evawuates Wust code"
   _cls_doc: "Evawuates code in vawious wangwuages"
 
 translate:

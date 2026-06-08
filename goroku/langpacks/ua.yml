@@ -208,11 +208,11 @@ goroku_web:
 
 goroku_backup:
   period: "⌚️ <b>Пристрій «ALPHA»</b> створює регулярні резервні копії. Ці налаштування можна змінити пізніше.\n\nБудь ласка, виберіть частоту резервного копіювання\n\n<b>🚫 Таким чином неможливо відновити модулі, завантажені з файлів за допомогою команди .lm! Будьте обережні та виконайте .backupmods перед відновленням.</b>"
-  saved: "✅ Періодичність збережено! Її можна змінити за допомогою <code>{prefix}set_backup_period</code>"  
-  saved_bot: "✅ Періодичність збережено! Її можна змінити за допомогою {prefix}set_backup_period"
-  never: "✅ Я не робитиму автоматичне резервне копіювання. Можна скасувати за допомогою <code>{prefix}set_backup_period</code>"
-  never_bot: "✅ Я не робитиму автоматичне резервне копіювання. Можна скасувати за допомогою {prefix}set_backup_period"
-  invalid_args: "🚫 <b>Будь ласка, вкажіть правильну частоту в годинах або 0 для вимкнення</b>"
+  saved: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Періодичність збережено! Її можна змінити за допомогою <code>{prefix}set_backup_period</code>"
+  saved_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Періодичність збережено! Її можна змінити за допомогою {prefix}set_backup_period"
+  never: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Я не робитиму автоматичне резервне копіювання. Можна скасувати за допомогою <code>{prefix}set_backup_period</code>"
+  never_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Я не робитиму автоматичне резервне копіювання. Можна скасувати за допомогою {prefix}set_backup_period"
+  invalid_args: "<tg-emoji emoji-id=\"4918014360267260850\">⛔️</tg-emoji> <b>Будь ласка, вкажіть правильну частоту в годинах або 0 для вимкнення</b>"
   backup_caption: '<tg-emoji emoji-id=5469718869536940860>👆</tg-emoji> <b>Це резервна копія вашої бази даних. Не повідомляйте його нікому, він містить особисту інформацію. Якщо вам потрібно його відновити, використовуйте</b> <pre><code class="language-goroku">{prefix}restoredb</code></pre> <b>у відповідь на цей файл.</b>'
   backupall_info: '👆 <b>Це ваша резервна копія бази даних і модулів. Не давайте його нікому, він містить особисту інформацію. Якщо вам потрібно його відновити, використовуйте</b> <pre><code class="language-goroku">{prefix}restoreall</code></pre> <b>у відповідь на цей файл.</b>'
   all_restored: "<tg-emoji emoji-id=5774134533590880843>🔄</tg-emoji> <b>Вашу повну резервну копію відновлено, перезапуск....</b>"
@@ -601,13 +601,16 @@ eval:
   no_compiler: "<tg-emoji emoji-id={}>💻</tg-emoji> <b>Компілятор {} не встановлено в системі.</b>"
   eval_result: "\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> Результат:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   print_outp: "\n\n<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji><b> Друкувати результат:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  _cmd_doc_e: "Виконує Python код"
+  _cmd_doc_e: "Виконує Go код"
+  _cmd_doc_eval: "Виконує Go код"
+  _cmd_doc_evalpy: "Виконує Python код"
   _cmd_doc_ebf: "Виконує Brainf*ck код"
   _cmd_doc_ec: "Виконує C код"
   _cmd_doc_ecpp: "Виконує C++ код"
   _cmd_doc_enode: "Виконує Node.js код"
   _cmd_doc_ephp: "Виконує PHP код"
   _cmd_doc_eruby: "Виконує Ruby код"
+  _cmd_doc_erust: "Виконує Rust код"
 
 translate:
   no_args: "<tg-emoji emoji-id=5210952531676504517>❌</tg-emoji> <b>Немає аргументів</b>"

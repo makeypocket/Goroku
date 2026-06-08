@@ -9,7 +9,11 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+
+
 func (im *InlineManager) HandleUpdate(update tgbotapi.Update) {
+	log.Printf("[Inline] HandleUpdate: ID=%d, InlineQuery=%t, CallbackQuery=%t, ChosenInlineResult=%t\n",
+		update.UpdateID, update.InlineQuery != nil, update.CallbackQuery != nil, update.ChosenInlineResult != nil)
 	if update.InlineQuery != nil {
 		im.handleInlineQuery(update.InlineQuery)
 	} else if update.CallbackQuery != nil {

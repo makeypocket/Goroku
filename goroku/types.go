@@ -143,7 +143,7 @@ type CustomTelegramClient struct {
 	GorokuPermsCache       map[interface{}]map[interface{}]CacheRecordPerms
 	GorokuFullChannelCache map[interface{}]CacheRecordFullChannel
 	GorokuFullUserCache    map[interface{}]CacheRecordFullUser
-	ForbiddenConstructors  []int
+	ForbiddenConstructors  []uint32
 	GorokuMe               interface{}
 	GorokuDB               interface{}
 	Loader                 interface{}
@@ -178,7 +178,7 @@ func NewCustomTelegramClient(tgID int64) *CustomTelegramClient {
 		GorokuPermsCache:       make(map[interface{}]map[interface{}]CacheRecordPerms),
 		GorokuFullChannelCache: make(map[interface{}]CacheRecordFullChannel),
 		GorokuFullUserCache:    make(map[interface{}]CacheRecordFullUser),
-		ForbiddenConstructors:  make([]int, 0),
+		ForbiddenConstructors:  make([]uint32, 0),
 	}
 }
 

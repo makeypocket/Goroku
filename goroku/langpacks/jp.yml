@@ -222,11 +222,11 @@ goroku_web:
 
 goroku_backup:
   period: "⌚️ <b>ユニット «ALPHA»</b> は定期的なバックアップを作成します。これらの設定は後で変更できます。\n\nバックアップの頻度を選択してください\n\n<b>🚫 これにより、.lm コマンドでファイルからダウンロードされたモジュールを復元することは不可能になります！注意してください。復元する前に .backupmods を行ってください。</b>"
-  saved: "✅ 周期が保存されました！ <code>{prefix}set_backup_period</code> で変更できます"
-  saved_bot: "✅ 周期が保存されました！ {prefix}set_backup_period で変更できます"
-  never: "✅ 自動バックアップは行いません。<code>{prefix}set_backup_period</code> を使用してキャンセルできます"
-  never_bot: "✅ 自動バックアップは行いません。{prefix}set_backup_period を使用してキャンセルできます"
-  invalid_args: "🚫 <b>正しい頻度を時間単位で指定するか、無効にする場合は `0` を指定してください</b>"
+  saved: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> 周期が保存されました！ <code>{prefix}set_backup_period</code> で変更できます"
+  saved_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> 周期が保存されました！ {prefix}set_backup_period で変更できます"
+  never: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> 自動バックアップは行いません。<code>{prefix}set_backup_period</code> を使用してキャンセルできます"
+  never_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> 自動バックアップは行いません。{prefix}set_backup_period を使用してキャンセルできます"
+  invalid_args: "<tg-emoji emoji-id=\"4918014360267260850\">⛔️</tg-emoji> <b>正しい頻度を時間単位で指定するか、無効にする場合は `0` を指定してください</b>"
   backup_caption: '<tg-emoji emoji-id=5469718869536940860>👆</tg-emoji> <b>これはデータベースのバックアップです。個人情報が含まれているため、誰とも共有しないでください。復元する必要がある場合は、このファイルへの返信として</b> <pre><code class="language-goroku">{prefix}restoredb</code></pre> <b>を使用してください。</b>'
   backupall_info: '👆 <b>これはデータベースとモジュールのバックアップです。個人情報が含まれているため、誰にも渡さないでください。復元する必要がある場合は、このファイルへの返信として</b> <pre><code class="language-goroku">{prefix}restoreall</code></pre> <b>を使用してください。</b>'
   all_restored: "<tg-emoji emoji-id=5774134533590880843>🔄</tg-emoji> <b>完全バックアップが復元されました。再起動しています...</b>"
@@ -634,13 +634,16 @@ eval:
   time_exec: "\n<tg-emoji emoji-id=5134202243486057363>💫</tg-emoji> <b>実行時間: {}秒</b>"
   eval_result: "\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> 結果:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   print_outp: "\n\n<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji><b> Print 結果:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  _cmd_doc_e: "Python コードを評価します"
+  _cmd_doc_e: "Go コードを評価します"
+  _cmd_doc_eval: "Go コードを評価します"
+  _cmd_doc_evalpy: "Python コードを評価します"
   _cmd_doc_ebf: "Brainf*ck コードを評価します"
   _cmd_doc_ec: "C コードを評価します"
   _cmd_doc_ecpp: "C++ コードを評価します"
   _cmd_doc_enode: "Node.js コードを評価します"
   _cmd_doc_ephp: "PHP コードを評価します"
   _cmd_doc_eruby: "Ruby コードを評価します"
+  _cmd_doc_erust: "Rust コードを評価します"
   _cls_doc: "さまざまな言語でコードを評価します"
 
 translate:

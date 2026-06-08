@@ -14,10 +14,7 @@ import (
 	"time"
 )
 
-const botIDPattern = `<a class="tm-row tm-row-link" href="/botfather/bot/(\d+)">` +
-	`<img class="tm-row-pic tm-row-pic-user" src="[^"]+">` +
-	`<div> <div class="tm-row-value">[^<]*</div>` +
-	`<div class="tm-row-description">@%s</div> </div></a>`
+const botIDPattern = `(?s)<a[^>]*href="/botfather/bot/(\d+)"[^>]*>(?:[^<]|<[^/]|</[^a]|</[aA][^>])*@%s.*?</a>`
 
 
 var (

@@ -92,6 +92,11 @@ func findModuleSource(structName string) (string, error) {
 
 func formatTrans(trans string, args ...string) string {
 	res := trans
+	res = strings.ReplaceAll(res, "href={}", "href=\"{}\"")
+	res = strings.ReplaceAll(res, "href='{}'", "href=\"{}\"")
+	reEmoji := regexp.MustCompile(`emoji-id=([0-9]+)`)
+	res = reEmoji.ReplaceAllString(res, `emoji-id="$1"`)
+
 	for i, arg := range args {
 		res = strings.ReplaceAll(res, fmt.Sprintf("{%d}", i), arg)
 	}

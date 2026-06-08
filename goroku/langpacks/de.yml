@@ -208,11 +208,11 @@ goroku_web:
 
 goroku_backup:
   period: "⌚️ <b>Die Unit «ALPHA»</b> erstellt regelmäßig Backups. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Backup-Häufigkeit\n\n<b>🚫 Es ist daher nicht möglich, Module, die mit dem Befehl .lm aus Dateien heruntergeladen wurden, wiederherzustellen! Seien Sie vorsichtig und führen Sie vor der Wiederherstellung .backupmods aus.</b>"
-  saved: "✅ Die Periodizität ist gespeichert! Sie kann mit <code>{prefix}set_backup_period</code> geändert werden."
-  saved_bot: "✅ Die Periodizität ist gespeichert! Sie kann mit {prefix}set_backup_period geändert werden."
-  never: "✅ Ich werde keine automatischen Backups durchführen. Kann mit <code>{prefix}set_backup_period</code> abgebrochen werden."
-  never_bot: "✅ Ich werde keine automatischen Backups durchführen. Kann mit {prefix}set_backup_period abgebrochen werden."
-  invalid_args: "🚫 <b>Bitte geben Sie die korrekte Häufigkeit in Stunden an oder 0 zum Deaktivieren</b>"
+  saved: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Die Periodizität ist gespeichert! Sie kann mit <code>{prefix}set_backup_period</code> geändert werden."
+  saved_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Die Periodizität ist gespeichert! Sie kann mit {prefix}set_backup_period geändert werden."
+  never: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Ich werde keine automatischen Backups durchführen. Kann mit <code>{prefix}set_backup_period</code> abgebrochen werden."
+  never_bot: "<tg-emoji emoji-id=\"4916036072560919511\">✅</tg-emoji> Ich werde keine automatischen Backups durchführen. Kann mit {prefix}set_backup_period abgebrochen werden."
+  invalid_args: "<tg-emoji emoji-id=\"4918014360267260850\">⛔️</tg-emoji> <b>Bitte geben Sie die korrekte Häufigkeit in Stunden an oder 0 zum Deaktivieren</b>"
   backup_caption: '<tg-emoji emoji-id=5469718869536940860>👆</tg-emoji> <b>Dies ist Ihr Datenbank-Backup. Geben Sie es nicht an Dritte weiter, es enthält persönliche Informationen. Falls Sie es wiederherstellen müssen, verwenden Sie</b> <pre><code class="language-goroku">{prefix}restoredb</code></pre> <b>als Antwort auf diese Datei</b>.'
   backupall_info: '👆 <b>Dies ist Ihre Sicherungskopie der Datenbank und Module. Geben Sie sie nicht weiter, da sie persönliche Informationen enthält. Falls Sie sie wiederherstellen müssen, verwenden Sie</b> <pre><code class="language-goroku">{prefix}restoreall</code></pre> <b>als Antwort auf diese Datei.</b>'
   all_restored: "<tg-emoji emoji-id=5774134533590880843>🔄</tg-emoji> <b>Ihre vollständige Sicherung wurde wiederhergestellt, Neustart...</b>"
@@ -599,13 +599,16 @@ eval:
   no_compiler: "<tg-emoji emoji-id={}>💻</tg-emoji> <b>Compiler {} ist auf dem System nicht installiert.</b>"
   eval_result: "\n\n<tg-emoji emoji-id=5197688912457245639>✅</tg-emoji><b> Ergebnis:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   print_outp: "\n\n<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji><b> Ergebnis drucken:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  _cmd_doc_e: "Führt Python-Code aus"
+  _cmd_doc_e: "Führt Go-Code aus"
+  _cmd_doc_eval: "Führt Go-Code aus"
+  _cmd_doc_evalpy: "Führt Python-Code aus"
   _cmd_doc_ebf: "Führt Brainf*ck-Code aus"
   _cmd_doc_ec: "Führt C-Code aus"
   _cmd_doc_ecpp: "Führt C++-Code aus"
   _cmd_doc_enode: "Führt Node.js-Code aus"
   _cmd_doc_ephp: "Führt PHP-Code aus"
   _cmd_doc_eruby: "Führt Ruby-Code aus"
+  _cmd_doc_erust: "Führt Rust-Code aus"
 
 translate:
   no_args: "<tg-emoji emoji-id=5210952531676504517>❌</tg-emoji> <b>Keine Argumente angegeben</b>"

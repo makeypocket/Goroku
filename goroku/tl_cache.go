@@ -795,7 +795,7 @@ type forbiddenInvoker struct {
 func (f *forbiddenInvoker) Invoke(ctx context.Context, input bin.Encoder, output bin.Decoder) error {
 	if input != nil {
 		if t, ok := input.(interface{ TypeID() uint32 }); ok {
-			typeID := int(t.TypeID())
+			typeID := t.TypeID()
 			for _, forbidden := range f.client.ForbiddenConstructors {
 				if typeID == forbidden {
 					log.Printf("🎉 [API Protection] Blocked forbidden constructor call: %d\n", typeID)
@@ -874,16 +874,34 @@ func (f *forbiddenInvoker) Invoke(ctx context.Context, input bin.Encoder, output
 							if len(f.client.Ratelimiter) > threshold && !f.client.FloodWaitLock {
 								f.client.FloodWaitLock = true
 								f.client.SuspendUntil = now.Add(time.Duration(localFloodWait) * time.Second)
+
+								// Copy Ratelimiter slice to prevent data race with concurrent reads/writes
+								limiterCopy := make([]RateLimitRecord, len(f.client.Ratelimiter))
+								copy(limiterCopy, f.client.Ratelimiter)
+
 								f.client.RatelimitMu.Unlock()
 
 								// Dump report and send
-								reportBytes, _ := json.MarshalIndent(f.client.Ratelimiter, "", "  ")
+								reportBytes, _ := json.MarshalIndent(limiterCopy, "", "  ")
 								caption := fmt.Sprintf("⚠️ <b>Goroku local floodwait triggered!</b>\n"+
 									"Suspended all target calls for %d seconds to prevent API ban.", localFloodWait)
 
-								go func(data []byte, capText string) {
-									_, _ = f.client.SendFile(f.client.TGID, data, capText)
-								}(reportBytes, caption)
+								// Send report via Bot API if available to bypass gotd suspension block, otherwise fall back to SendFile
+								im, okInline := f.client.GorokuInline.(*inline.InlineManager)
+								if okInline && im != nil && im.GetBotAPI() != nil {
+									botClient := im.GetBotAPI()
+									fb := tgbotapi.FileBytes{Name: "report.json", Bytes: reportBytes}
+									go func() {
+										doc := tgbotapi.NewDocument(f.client.TGID, fb)
+										doc.Caption = caption
+										doc.ParseMode = tgbotapi.ModeHTML
+										_, _ = botClient.Send(doc)
+									}()
+								} else {
+									go func(data []byte, capText string) {
+										_, _ = f.client.SendFile(f.client.TGID, data, capText)
+									}(reportBytes, caption)
+								}
 
 								// Sleep
 								time.Sleep(time.Duration(localFloodWait) * time.Second)
@@ -1308,6 +1326,9 @@ func (c *CustomTelegramClient) SendFileWithOptions(chat interface{}, file interf
 				targetBotChatID := c.ToBotAPIChatID(targetChatID)
 				var fileBytes []byte
 				var filename string = "file.bin"
+				if named, ok := file.(interface{ Name() string }); ok {
+					filename = named.Name()
+				}
 				var isURL bool
 
 				switch f := file.(type) {
@@ -1813,11 +1834,11 @@ func WithWebPageMedia(url string, optional bool, forceLarge bool) MsgOption {
 	}
 }
 
-func (c *CustomTelegramClient) ForbidConstructor(constructor int) {
+func (c *CustomTelegramClient) ForbidConstructor(constructor uint32) {
 	c.ForbiddenConstructors = append(c.ForbiddenConstructors, constructor)
 }
 
-func (c *CustomTelegramClient) ForbidConstructors(constructors []int) {
+func (c *CustomTelegramClient) ForbidConstructors(constructors []uint32) {
 	c.ForbiddenConstructors = append(c.ForbiddenConstructors, constructors...)
 }
 
@@ -2621,3 +2642,4 @@ func (c *CustomTelegramClient) Translate(chat interface{}, msgID int, toLang str
 	}
 	return sb.String(), nil
 }
+
